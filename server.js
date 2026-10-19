@@ -3,6 +3,7 @@ import "dotenv/config";
 import swaggerUI from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import equipesRoutes from "./src/routes/equipesRoutes.js";
+import prisma 
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -63,6 +64,17 @@ app.get("/", (req, res) => {
 
 app.use("/equipes", equipesRoutes);
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
+try {
+  await prisma.$connect();
+  console.log("Conectado ao banco de dados!")
+  
+
+  app.listen(port,() => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
+  });
+  } catch (error) {
+    console.error("Erro ao conectar ao banco de dados:", error.message);
+
+    await prisma.$disconnect();
+    process.exitCode = 1;
+  }
